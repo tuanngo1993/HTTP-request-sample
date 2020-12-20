@@ -1,7 +1,11 @@
 const listWrapper = document.querySelector(".posts");
 const singlePost = document.getElementById("single-post");
+const fetchBtn = document
+	.getElementById("available-posts")
+	.querySelector("button");
+const submitPostBtn = document.getElementById("new-post").querySelector("form");
 
-function sendHTTPRequest(method, url) {
+function sendHTTPRequest(method, url, data) {
 	const promise = new Promise((resolve, reject) => {
 		// Create a new XMLHttpRequest object (allow to send HTTPRequest)
 		const xhr = new XMLHttpRequest();
@@ -19,13 +23,14 @@ function sendHTTPRequest(method, url) {
 		};
 
 		// Send the request
-		xhr.send();
+		xhr.send(JSON.stringify(data)); // Convert string to JSON
 	});
 
 	return promise;
 }
 
 async function fetchPost() {
+	listWrapper.innerHTML = "";
 	// Option 1
 	// sendHTTPRequest("GET", "https://jsonplaceholder.typicode.com/posts").then(
 	// 	(responseData) => {
@@ -55,4 +60,26 @@ async function fetchPost() {
 	}
 }
 
-fetchPost();
+async function createPost(title, content) {
+	const newPost = {
+		title: title,
+		body: content,
+		userId: Math.random(),
+	};
+
+	sendHTTPRequest(
+		"POST",
+		"https://jsonplaceholder.typicode.com/posts",
+		newPost
+	);
+}
+
+fetchBtn.addEventListener("click", fetchPost);
+
+submitPostBtn.addEventListener("submit", (e) => {
+	e.preventDefault();
+	const title = e.currentTarget.querySelector("#title").value;
+	const conttent = e.currentTarget.querySelector("#content").value;
+
+	createPost(title, conttent);
+});
